@@ -1,0 +1,4 @@
+.idea/
+scripts/.ipynb_checkpoints/
+data/train.csv
+data/test.csv
