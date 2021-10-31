@@ -86,7 +86,7 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
         # Compute w
         w = w - gamma * dL
         
-        return w, loss
+    return w, loss
 
 
 def least_squares(y, tx):
@@ -99,11 +99,12 @@ def least_squares(y, tx):
 
 def ridge_regression(y, tx, lambda_):
     """Ridge regression using normal equations."""
-    N = tx.shape[0]
+    N, M = tx.shape
+    w = np.zeros(M)
     lambda_pr = 2 * N * lambda_
     
-    A = tx.T@tx + lambda_pr * np.identity(N)
-    b = tx.T@y
+    A = tx.T @ tx + N*lambda_ * np.eye(M)
+    b = tx.T @ y
     
     w = np.linalg.solve(A, b)
     loss = compute_loss(y, tx, w)
@@ -216,6 +217,7 @@ def build_poly(x, degree):
     
     return phi
 
+
 def cross_validation(y, x, k_indices, k, degree, method, lambda_=0):
     """Return the loss of ridge regression."""
     # Get k'th subgroup in test, others in train
@@ -250,3 +252,26 @@ def cross_validation(y, x, k_indices, k, degree, method, lambda_=0):
     loss_te = compute_loss(y_te, tx_te, w)
     
     return loss_tr, loss_te, w
+
+
+def replace_na_values(data):
+    """Replace NA values (-999.0) with the mean value of their column."""
+    for i in range(data.shape[1]):
+            # If NA values in column
+            if na(data[:, i]):
+                msk = (data[:, i] != -999.)
+                # Replace NA values with mean value
+                median = np.median(data[msk, i])
+                if math. isnan(median):
+                    median = 0
+                data[~msk, i] = median
+    return data
+
+
+def get_masks(x):
+    """Returns 3 masks depending on the number of jets of the event."""
+    return {
+        0: x[:, 22] == 0,
+        1: x[:, 22] == 1,
+        2: np.logical_or(x[:, 22] == 2, x[:, 22] == 3)
+    }

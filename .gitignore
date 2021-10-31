@@ -1,4 +1,7 @@
 .idea/
+
 scripts/.ipynb_checkpoints/
+scripts/__pycache__/
+
 data/train.csv
 data/test.csv
