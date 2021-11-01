@@ -4,7 +4,7 @@ Implementation of some Machine Learning methods.
 The loss is always calculated with MSE.
 """
 import numpy as np
-
+from proj1_helpers import *
 
 def compute_loss(y, tx, w):
     """Calculate the loss with MSE."""
@@ -204,54 +204,52 @@ def reg_logistic_regression(y, tx, lambda_, initial_w, max_iters, gamma):
         
     return w, loss
 
+def compute_accuracy(y, predictions):
+    """Computes the accuracy of the model"""
+    n_equals = 0
+    for i in range(y.shape[0]):
+        if predictions[i] == y[i]:
+            n_equals += 1
 
-def build_poly(x, degree):
-    """Polynomial basis functions for input data x, for j=0 up to j=degree."""
-    # This function should return the matrix formed
-    # by applying the polynomial basis to the input data
-    n = x.shape[0]
-    phi = np.zeros((n,degree+1))
-    for i in range(n):
-        for j in range(degree+1):
-            phi[i][j] = x[i]**j
-    
-    return phi
+    return n_equals / y.shape[0]
 
 
-def cross_validation(y, x, k_indices, k, degree, method, lambda_=0):
-    """Return the loss of ridge regression."""
+def build_k_indices(y, k_fold, seed):
+    """build k indices for k-fold."""
+    num_row = y.shape[0]
+    interval = int(num_row / k_fold)
+    np.random.seed(seed)
+    indices = np.random.permutation(num_row)
+    k_indices = [indices[k * interval: (k + 1) * interval]
+                 for k in range(k_fold)]
+    return np.array(k_indices)
+
+
+def cross_validation(y, x, k_indices, k, method, **args):
+    """
+    Completes k-fold cross-validation using the regression method
+    passed as argument.
+    """
     # Get k'th subgroup in test, others in train
-    tr_indices_set = np.delete(k_indices, k, 0)
-    x_tr = x[tr_indices_set].flatten()
-    y_tr = y[tr_indices_set].flatten()
+    tr_indices_set = np.delete(k_indices, k, 0).flatten()
+    x_tr = x[tr_indices_set]
+    y_tr = y[tr_indices_set] 
     
     te_indices = k_indices[k]
     x_te = x[te_indices]
     y_te = y[te_indices]
-    
-    # Form data with polynomial degree
-    tx_tr = build_poly(x_tr, degree)
-    tx_te = build_poly(x_te, degree)
-    
-    # Regression on the training set
-    if method=='ridge_regression':
-        w, loss_tr = ridge_regression(y_tr, tx_tr, lambda_)
-    elif method=='least_squares_GD':
-        w, loss_tr = least_squares_GD(y_tr, tx_tr, initial_w, max_iters, gamma)
-    elif method=='least_squares_SGD':
-        w, loss_tr = least_squares_SGD(y_tr, tx_tr, initial_w, max_iters, gamma)
-    elif method=='least_squares':
-        w, loss_tr = least_squares(y_tr, tx_tr)
-    elif method=='logistic_regression':
-        w, loss_tr = logistic_regression(y_tr, tx_tr, initial_w, max_iters, gamma)
-    elif method=='reg_logistic_regression':
-        w, loss_tr = reg_logistic_regression(y_tr, tx_tr, lambda_, initial_w, max_iters, gamma)
 
-    
-    # Calculate the loss for train and test data
-    loss_te = compute_loss(y_te, tx_te, w)
-    
-    return loss_tr, loss_te, w
+    # Apply the regression method
+    w, loss = method(y=y_tr, tx=x_tr, **args)
+
+    # Predict outputs with the w 
+    predictions = predict_labels(w, x_te)
+
+    # Calculate accurancy
+    accurancy = compute_accuracy(y_te, predictions)
+
+    return accurancy
+
 
 
 def replace_na_values(data):
