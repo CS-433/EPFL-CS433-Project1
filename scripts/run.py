@@ -44,7 +44,11 @@ def main():
     
     # To store predictions
     preds = np.zeros(tX_test.shape[0])
-
+    
+    # Parameters
+    degree = 4
+    lambda_ = 1e-5
+    
     for i in range(len(masks_train)):
         # Get events
         train_data = tX_train[masks_train[i]]
@@ -58,11 +62,12 @@ def main():
             train_data = replace_na_values(train_data)
             test_data = replace_na_values(test_data)
         
-        train_phi = build_poly(train_data, 4)
-        test_phi = build_poly(test_data, 4)
+        # Build poly
+        train_phi = build_poly(train_data, degree)
+        test_phi = build_poly(test_data, degree)
         
         # Obtain weight
-        weight, _ = ridge_regression(train_y, train_phi, 0.00001)
+        weight, _ = ridge_regression(train_y, train_phi, lambda_)
 
         # Generate predictions
         pred_y = predict_labels(weight, test_phi)

@@ -4,7 +4,6 @@ Implementation of some Machine Learning methods.
 The loss is always calculated with MSE.
 """
 import numpy as np
-import math
 from proj1_helpers import *
 
 def compute_loss(y, tx, w):
@@ -256,7 +255,6 @@ def cross_validation(y, x, k_indices, k, method, **args):
     return accurancy
 
 
-
 def replace_na_values(data):
     """Replace NA values (-999.0) with the mean value of their column."""
     for i in range(data.shape[1]):
@@ -266,6 +264,7 @@ def replace_na_values(data):
         if np.isnan(median):
             median = 0
         data[~msk, i] = median
+    
     return data
 
 
@@ -288,7 +287,7 @@ def remove_related_features(tX):
 
 
 def build_poly(x, degree):
-    """ Apply a polynomial basis to all the X features."""
+    """Polynomial basis functions for input data x, for j=0 up to j=degree."""
     rows, cols = x.shape
 
     phi = np.zeros((rows, cols*(degree)))
