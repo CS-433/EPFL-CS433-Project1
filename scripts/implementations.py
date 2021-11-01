@@ -288,44 +288,18 @@ def remove_related_features(tX):
 
 
 def build_poly(x, degree):
-    """ Apply a polynomial basis to all the X features. """
-    # First, we find the combinations of columns for which we have to
-    # compute the product
-    m, n = x.shape
+    """ Apply a polynomial basis to all the X features."""
+    rows, cols = x.shape
 
-    combinations = {}
+    phi = np.zeros((rows, cols*(degree)))
 
-    # Add combinations of same column power
-    for i in range(n * degree):
-        if i < n:
-            combinations[i] = [i]
-        else:
-            col_number = i - n
-            cpt = 2
-            while col_number >= n:
-                col_number -= n
-                cpt += 1
-            combinations[i] = [col_number] * cpt
+    for i in range(rows):
+        for j in range(cols):
+            phi[i][j] = x[i][j]
 
-    # Add combinations of products between columns
-    cpt = i + 1
+    for d in range(2, degree+1):
+        for i in range(rows):
+            for j in range(cols):
+                phi[i][j + (d-1)*cols] = x[i][j]**d
 
-    for i in range(n):
-        for j in range(i + 1, n):
-            combinations[cpt] = [i, j]
-            cpt = cpt + 1
-
-    # Now we can fill a new matrix with the column combinations
-    eval_poly = np.zeros(
-        shape=(m, n + len(combinations))
-    )
-
-    for i, c in combinations.items():
-        eval_poly[:, i] = x[:, c].prod(1)
-
-    # Add square root
-    for i in range(0, n):
-        eval_poly[:, len(combinations) + i] = np.abs(x[:, i]) ** 0.5
-
-    return eval_poly
-
+    return phi

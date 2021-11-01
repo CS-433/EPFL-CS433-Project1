@@ -58,8 +58,8 @@ def main():
             train_data = replace_na_values(train_data)
             test_data = replace_na_values(test_data)
         
-        train_phi = build_poly(train_data, 3)
-        test_phi = build_poly(test_data, 3)
+        train_phi = build_poly(train_data, 4)
+        test_phi = build_poly(test_data, 4)
         
         # Obtain weight
         weight, _ = ridge_regression(train_y, train_phi, 0.00001)
