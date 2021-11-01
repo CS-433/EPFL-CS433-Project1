@@ -4,6 +4,7 @@ Implementation of some Machine Learning methods.
 The loss is always calculated with MSE.
 """
 import numpy as np
+import math
 from proj1_helpers import *
 
 def compute_loss(y, tx, w):
@@ -255,14 +256,12 @@ def cross_validation(y, x, k_indices, k, method, **args):
 def replace_na_values(data):
     """Replace NA values (-999.0) with the mean value of their column."""
     for i in range(data.shape[1]):
-            # If NA values in column
-            if na(data[:, i]):
-                msk = (data[:, i] != -999.)
-                # Replace NA values with mean value
-                median = np.median(data[msk, i])
-                if math. isnan(median):
-                    median = 0
-                data[~msk, i] = median
+        msk = (data[:, i] != -999.)
+        # Replace NA values with mean value
+        median = np.median(data[msk, i])
+        if math.isnan(median):
+            median = 0
+        data[~msk, i] = median
     return data
 
 

@@ -4,15 +4,17 @@
     submission to the competition system.
 """
 
-# Useful starting lines
 import numpy as np
 import zipfile
 from pathlib import Path
 from proj1_helpers import *
-from implementations import least_square
+from implementations import *
 
 
 def main():
+     
+    print('Running...')
+        
     # Unzip data files
     my_file = Path("../data/train.csv")
     if not my_file.is_file():
@@ -30,17 +32,39 @@ def main():
     # Load data
     y, tX_train, ids = load_csv_data(DATA_TRAIN_PATH)
     _, tX_test, ids_test = load_csv_data(DATA_TEST_PATH)
+    
+    
+    # Split data
+    masks_train = get_masks(tX_train)
+    masks_test = get_masks(tX_test)
+    
+    # Parameters per subset
+    lambdas = [0.002, 0.001, 0.001]
+    
+    # To store predictions
+    y_pred = np.zeros(tX_test.shape[0])
 
-    lambda_ = 1e-5
-    weight, _ = ridge_regression(y, tX, lambda_)
-    y_pred = predict_labels(weight, tX_test)
+    for idx in range(len(masks_train)):
+        # Get events
+        x_train = tX_train[masks_train[idx]]
+        y_train = y[masks_train[idx]]
+        x_test = tX_test[masks_test[idx]]
+
+        # Replace missing values
+        x_train = replace_na_values(x_train)
+        x_test = replace_na_values(x_test)
         
-    # We give the name of the output file
-    OUTPUT_PATH = '../data/submission.csv'
-    # Generate predictions and save ouput in csv format for submission:
-    create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
+        # Obtain weight
+        weight, _ = ridge_regression(y_train, x_train, lambdas[idx])
 
-    print('Done !')
+        # Generate predictions
+        y_test_pred = predict_labels(weight, x_test)
+        y_pred[masks_test[idx]] = y_test_pred
+    
+    # Generate file csv for submission
+    OUTPUT_PATH = '../data/submission.csv'
+    create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
+    print('Submission file created!')
 
 
 if __name__ == "__main__":
