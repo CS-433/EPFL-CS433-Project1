@@ -42,12 +42,6 @@ def main():
     masks_train = get_masks(tX_train)
     masks_test = get_masks(tX_test)
     
-    # Parameters per subset
-    lambdas = [0.00005, 0.00001, 0.00001]
-    
-    # Polynomial degree per subset
-    degrees = [4, 7, 9]
-    
     # To store predictions
     preds = np.zeros(tX_test.shape[0])
 
@@ -64,11 +58,11 @@ def main():
             train_data = replace_na_values(train_data)
             test_data = replace_na_values(test_data)
         
-        train_phi = build_poly(train_data, degrees[i])
-        test_phi = build_poly(test_data, degrees[i])
+        train_phi = build_poly(train_data, 3)
+        test_phi = build_poly(test_data, 3)
         
         # Obtain weight
-        weight, _ = ridge_regression(train_y, train_phi, lambdas[i])
+        weight, _ = ridge_regression(train_y, train_phi, 0.00001)
 
         # Generate predictions
         pred_y = predict_labels(weight, test_phi)

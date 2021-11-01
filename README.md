@@ -2,7 +2,9 @@
 # Machine Learning  CS-433
 ## Class Project 1 | ML Higgs
 
-Welcome to the repository which contains the code for the  [Project 1](https://github.com/epfml/ML_course/tree/master/projects/project1/)  of the course of Machine Learning at the EPFL.
+Welcome to the repository!
+
+This repository contains the code for  [Project 1](https://github.com/sansive/EPFL-CS433-Project1)  of the course of Machine Learning at EPFL.
 
 The aim of this project has been to sort of recreating the process of “discovering” the Higgs particle, through the analysis of decay signature of protons collisions.
 
@@ -18,7 +20,7 @@ The running of the code can be done with:
 ```
 python3 run.py
 ```
-After running the code, the user will get as output a ```submission.csv ``` file, which will be located in the same file that ```run.py```
+After running the code, the user will get as output a ```submission.csv ``` file, which will be located in the **data folder**.
 
 ## Structure
 
@@ -38,7 +40,7 @@ After running the code, the user will get as output a ```submission.csv ``` file
 ```
 
 ## Credits
-This project has been developped by the team **Machakahomers** , composed by 3 ML students:
+This project has been developed by the team **Machakahomers** , composed by 3 ML students:
 - Sandra Sierra ([@sansive](https://github.com/sansive))
 - Belén Gómez ([@belengg27](https://github.com/belengg27))
 - Rafael Mozo ([@rafaelmozo1](https://github.com/rafaelmozo1))

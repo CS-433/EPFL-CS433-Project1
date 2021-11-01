@@ -263,7 +263,7 @@ def replace_na_values(data):
         msk = (data[:, i] != -999.)
         # Replace NA values with mean value
         median = np.median(data[msk, i])
-        if math.isnan(median):
+        if np.isnan(median):
             median = 0
         data[~msk, i] = median
     return data
