@@ -92,7 +92,11 @@ def least_squares_SGD(y, tx, initial_w, max_iters, gamma):
 
 def least_squares(y, tx):
     """Least squares regression using normal equations."""
-    w = np.linalg.solve(tx.T@tx, tx.T@y)
+    A = tx.T@tx
+    b = tx.T@y
+    Apinv = np.linalg.pinv(A)
+    w = Apinv.dot(b)
+    
     loss = compute_loss(y, tx, w)
     
     return w, loss
@@ -267,8 +271,17 @@ def replace_na_values(data):
 
 def get_masks(x):
     """Returns 3 masks depending on the number of jets of the event."""
-    return {
-        0: x[:, 22] == 0,
-        1: x[:, 22] == 1,
-        2: np.logical_or(x[:, 22] == 2, x[:, 22] == 3)
-    }
+    # Note that 'PRI_jet_num' is the row 22
+    event0 = (x[:, 22] == 0)
+    event1 = (x[:, 22] == 1)
+    event2 = (x[:, 22] != 0) & (x[:, 22] != 1)
+    
+    return [event0, event1, event2]
+
+
+def remove_related_features(tX):
+    """Remove related features obtained during the exporation of the data."""
+    del_features = [5, 6, 12, 21, 24, 25, 26, 27, 28, 29]
+    np.delete(tX, del_features, 1)
+    
+    return tX

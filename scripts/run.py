@@ -9,12 +9,13 @@ import zipfile
 from pathlib import Path
 from proj1_helpers import *
 from implementations import *
+import warnings
 
 
 def main():
      
     print('Running...')
-        
+    
     # Unzip data files
     my_file = Path("../data/train.csv")
     if not my_file.is_file():
@@ -33,6 +34,9 @@ def main():
     y, tX_train, ids = load_csv_data(DATA_TRAIN_PATH)
     _, tX_test, ids_test = load_csv_data(DATA_TEST_PATH)
     
+    # Remove related features
+    tX_train = remove_related_features(tX_train)
+    tX_test = remove_related_features(tX_test)
     
     # Split data
     masks_train = get_masks(tX_train)
@@ -51,8 +55,11 @@ def main():
         x_test = tX_test[masks_test[idx]]
 
         # Replace missing values
-        x_train = replace_na_values(x_train)
-        x_test = replace_na_values(x_test)
+        # We expect to see this RuntimeWarning
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            x_train = replace_na_values(x_train)
+            x_test = replace_na_values(x_test)
         
         # Obtain weight
         weight, _ = ridge_regression(y_train, x_train, lambdas[idx])
