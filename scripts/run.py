@@ -43,34 +43,40 @@ def main():
     masks_test = get_masks(tX_test)
     
     # Parameters per subset
-    lambdas = [0.002, 0.001, 0.001]
+    lambdas = [0.00005, 0.00001, 0.00001]
+    
+    # Polynomial degree per subset
+    degrees = [4, 7, 9]
     
     # To store predictions
-    y_pred = np.zeros(tX_test.shape[0])
+    preds = np.zeros(tX_test.shape[0])
 
-    for idx in range(len(masks_train)):
+    for i in range(len(masks_train)):
         # Get events
-        x_train = tX_train[masks_train[idx]]
-        y_train = y[masks_train[idx]]
-        x_test = tX_test[masks_test[idx]]
+        train_data = tX_train[masks_train[i]]
+        train_y = y[masks_train[i]]
+        test_data = tX_test[masks_test[i]]
 
         # Replace missing values
         # We expect to see this RuntimeWarning
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=RuntimeWarning)
-            x_train = replace_na_values(x_train)
-            x_test = replace_na_values(x_test)
+            train_data = replace_na_values(train_data)
+            test_data = replace_na_values(test_data)
+        
+        train_phi = build_poly(train_data, degrees[i])
+        test_phi = build_poly(test_data, degrees[i])
         
         # Obtain weight
-        weight, _ = ridge_regression(y_train, x_train, lambdas[idx])
+        weight, _ = ridge_regression(train_y, train_phi, lambdas[i])
 
         # Generate predictions
-        y_test_pred = predict_labels(weight, x_test)
-        y_pred[masks_test[idx]] = y_test_pred
+        pred_y = predict_labels(weight, test_phi)
+        preds[masks_test[i]] = pred_y
     
     # Generate file csv for submission
     OUTPUT_PATH = '../data/submission.csv'
-    create_csv_submission(ids_test, y_pred, OUTPUT_PATH)
+    create_csv_submission(ids_test, preds, OUTPUT_PATH)
     print('Submission file created!')
 
 
